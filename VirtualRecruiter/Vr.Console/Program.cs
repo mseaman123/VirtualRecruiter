@@ -12,7 +12,7 @@ namespace Vr.Console
 	{
 		static void Main(string[] args)
 		{
-			var biz = new RecruiterBusiness();
+			//var biz = new RecruiterBusiness();
 			//biz.AddEngineeer(new Engineer {Description = "Cool", FirstName = "Mark", LastName = "Seaman"});
 			//biz.AddHiringResource(new HiringResource { Company = new Company() { CompanyName = "Browncoats" }, FirstName = "Sarvesh", LastName = "Chinnappa" });
 			//biz.AddHiringResource(new HiringResource { Company = new Company() { CompanyName = "Ryan" }, FirstName = "Steve", LastName = "Veller" });
@@ -23,7 +23,11 @@ namespace Vr.Console
 			//biz.AddSkill(new Skill { SkillName = "Angular" });
 			//biz.AddSkillsToEngineer(1, new List<int> {1, 2, 3, 4, 5 });
 
-			var mark = biz.GetEngineerDetails(1);
+			//var mark = biz.GetEngineerDetails(1);
+
+			//mark.Description = "I'm cool, so you should hire me.";
+			//mark.Skills.Remove(new Skill {SkillId = 5, SkillName = "SQL"});
+			//biz.UpdateEngineer(mark);
 		}
 	}
 }

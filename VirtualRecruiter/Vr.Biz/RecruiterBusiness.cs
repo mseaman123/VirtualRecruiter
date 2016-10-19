@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,60 +10,79 @@ using Vr.Domain;
 
 namespace Vr.Biz
 {
-    public class RecruiterBusiness
+    public class RecruiterBusiness : IRecruiterBusiness
     {
-	    public Engineer GetEngineerDetails(int id)
-	    {
-		    using (var context = new RecruiterContext())
-		    {
-			    var engineer =
-				    (from e in context.People.OfType<Engineer>().Include("Skills")
-					    where e.PersonId == id
-					    select e).FirstOrDefault();
+	    private readonly RecruiterContext _context;
+		public RecruiterBusiness(RecruiterContext context)
+		{
+			_context = context;
+		}
 
-				return engineer;
-		    }
-	    }
+		public IEnumerable<Engineer> GetAllEngineers()
+		{
+			var engineers =
+				(from e in _context.People.AsNoTracking().OfType<Engineer>()
+					select e).ToList();
+
+			return engineers;
+		}
+
+		public Engineer GetEngineerDetails(int id)
+		{
+			var engineer =
+				(from e in _context.People.AsNoTracking().OfType<Engineer>().Include("Skills")
+					where e.PersonId == id
+					select e).FirstOrDefault();
+
+			return engineer;
+		}
+
+		public Engineer UpdateEngineer(Engineer engineer)
+		{
+			_context.People.AddOrUpdate(engineer);
+			_context.SaveChanges();
+
+			return engineer;
+		}
+
+	    public void DeleteEngineer(int id)
+	    {
+		    var engineer =
+			    (from e in _context.People.OfType<Engineer>()
+				    where e.PersonId == id
+				    select e).FirstOrDefault();
+
+			_context.People.Remove(engineer);
+			_context.SaveChanges();
+		}
 
 		#region "Add methods"
 		public void AddEngineeer(Engineer engineer)
 		{
-			using (var context = new RecruiterContext())
-			{
-				context.People.Add(engineer);
-				context.SaveChanges();
-			}
+			_context.People.Add(engineer);
+			_context.SaveChanges();
 		}
 
 		public void AddHiringResource(HiringResource hr)
 		{
-			using (var context = new RecruiterContext())
-			{
-				context.People.Add(hr);
-				context.SaveChanges();
-			}
+			_context.People.Add(hr);
+			_context.SaveChanges();
 		}
 
 		public void AddSkill(Skill skill)
 		{
-			using (var context = new RecruiterContext())
-			{
-				context.Skills.Add(skill);
-				context.SaveChanges();
-			}
+			_context.Skills.Add(skill);
+			_context.SaveChanges();
 		}
 
 		public void AddSkillsToEngineer(int engineerId, IList<int> skillIds)
 		{
-			using (var context = new RecruiterContext())
-			{
-				Engineer eng = context.People.OfType<Engineer>().FirstOrDefault(p => p.PersonId == engineerId);
+			Engineer eng = _context.People.AsNoTracking().OfType<Engineer>().FirstOrDefault(p => p.PersonId == engineerId);
 
-				var skills = context.Skills.Where(s => skillIds.Contains(s.SkillId));
+			var skills = _context.Skills.Where(s => skillIds.Contains(s.SkillId));
 
-				eng?.Skills.AddRange(skills);
-				context.SaveChanges();
-			}
+			eng?.Skills.AddRange(skills);
+			_context.SaveChanges();
 		}
 		#endregion
 	}
